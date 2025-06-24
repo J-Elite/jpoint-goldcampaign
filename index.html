@@ -87,6 +87,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      z-index: 999;
     }
 
     .popup-box {
@@ -122,7 +123,48 @@
       font-family: 'DB Ozone X';
     }
 
-    /* ✅ Responsive for mobile */
+    /* 🔄 Loader Overlay */
+    #loading {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 998;
+    }
+
+    .loading-box {
+      background: #111;
+      border: 2px solid gold;
+      border-radius: 16px;
+      padding: 30px 40px;
+      text-align: center;
+    }
+
+    .loading-box h2 {
+      color: gold;
+      font-size: 20px;
+      margin-bottom: 20px;
+      font-family: 'DB Ozone X';
+    }
+
+    .loader {
+      border: 6px solid #333;
+      border-top: 6px solid gold;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
     @media (max-width: 500px) {
       #checkForm {
         flex-direction: column;
@@ -155,6 +197,15 @@
 
   <img src="campaign-banner.jpg" alt="แคมเปญลุ้นทอง" class="campaign-img" />
 
+  <!-- ✅ Loading Overlay -->
+  <div id="loading" class="popup-overlay">
+    <div class="loading-box">
+      <h2>กำลังค้นหาข้อมูล กรุณารอสักครู่...</h2>
+      <div class="loader"></div>
+    </div>
+  </div>
+
+  <!-- ✅ Result Popup -->
   <div id="popup" class="popup-overlay" style="display: none;">
     <div class="popup-box">
       <h2 id="popupMessage">คุณมีสิทธิ์ลุ้นโชคทั้งหมด</h2>
@@ -164,16 +215,21 @@
   </div>
 
   <script>
-    // 👇 ใส่ Google Apps Script URL ที่เชื่อม Google Sheet จริง
     const scriptURL = 'https://script.google.com/macros/s/AKfycbwAFodVGyPUG4fZSiSuIV4AxmBHty_QxgtiHdN04KslLuTKPeKTM0B28TBKIIGrxR06/exec';
 
     document.getElementById('checkForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const phone = document.getElementById('phoneInput').value.trim();
+      const loading = document.getElementById('loading');
+      const popup = document.getElementById('popup');
+
+      loading.style.display = 'flex'; // Show loading
 
       fetch(`${scriptURL}?phone=${encodeURIComponent(phone)}`)
         .then(res => res.json())
         .then(data => {
+          loading.style.display = 'none'; // Hide loading
+          popup.style.display = 'flex'; // Show popup
           if (data.found) {
             document.getElementById('popupMessage').textContent = 'คุณมีสิทธิ์ลุ้นโชคทั้งหมด';
             document.getElementById('chanceDisplay').textContent = Number(data.chance).toLocaleString('th-TH') + ' สิทธิ์';
@@ -181,11 +237,11 @@
             document.getElementById('popupMessage').textContent = 'ขออภัย! ไม่พบข้อมูลสมาชิก';
             document.getElementById('chanceDisplay').textContent = '';
           }
-          document.getElementById('popup').style.display = 'flex';
         })
         .catch(err => {
-          console.error(err);
+          loading.style.display = 'none';
           alert('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง');
+          console.error(err);
         });
     });
 
