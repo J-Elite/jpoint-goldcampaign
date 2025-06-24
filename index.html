@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ตรวจสอบสิทธิ์ลุ้นทอง</title>
+  <style>
+    @font-face {
+      font-family: 'DB Ozone X';
+      src: url('./fonts/db_ozonex.ttf') format('truetype');
+    }
+
+    body {
+      margin: 0;
+      font-family: 'DB Ozone X', sans-serif;
+      background-color: #000;
+      color: #fff;
+      text-align: center;
+      padding-top: 40px;
+    }
+
+    .title-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 30px;
+    }
+
+    .logo {
+      width: 120px;
+      height: 120px;
+      object-fit: contain;
+    }
+
+    h1 {
+      color: gold;
+      font-size: 28px;
+      margin: 0;
+    }
+
+    #checkForm {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 40px;
+    }
+
+    input {
+      padding: 12px 16px;
+      font-size: 20px;
+      width: 250px;
+      border: 2px solid gold;
+      border-radius: 8px;
+      background: #111;
+      color: #fff;
+      font-family: 'DB Ozone X';
+    }
+
+    button {
+      padding: 12px 20px;
+      background-color: red;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      font-family: 'DB Ozone X';
+      font-size: 20px;
+    }
+
+    .campaign-img {
+      margin-top: 40px;
+      width: 90%;
+      max-width: 400px;
+      border-radius: 12px;
+    }
+
+    .popup-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .popup-box {
+      background: #111;
+      border: 2px solid gold;
+      border-radius: 16px;
+      padding: 30px 40px;
+      text-align: center;
+    }
+
+    .popup-box h2 {
+      color: gold;
+      margin-bottom: 10px;
+      font-family: 'DB Ozone X';
+    }
+
+    .popup-box .chance {
+      font-size: 32px;
+      font-weight: bold;
+      color: red;
+      margin-bottom: 20px;
+      font-family: 'DB Ozone X';
+    }
+
+    .popup-box button {
+      padding: 10px 20px;
+      background-color: gold;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      color: black;
+      font-family: 'DB Ozone X';
+    }
+
+    /* ✅ Responsive for mobile */
+    @media (max-width: 500px) {
+      #checkForm {
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      input {
+        width: 90%;
+        max-width: 300px;
+      }
+
+      button {
+        width: 80%;
+        max-width: 200px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="title-container">
+    <img src="jpoint-logo.png" alt="J POINT" class="logo" />
+    <h1>ตรวจสอบสิทธิ์ลุ้นโชคทอง</h1>
+  </div>
+
+  <form id="checkForm">
+    <input type="tel" id="phoneInput" placeholder="กรอกเบอร์โทรศัพท์ของคุณ" required />
+    <button type="submit">ตรวจสอบสิทธิ์</button>
+  </form>
+
+  <img src="campaign-banner.jpg" alt="แคมเปญลุ้นทอง" class="campaign-img" />
+
+  <div id="popup" class="popup-overlay" style="display: none;">
+    <div class="popup-box">
+      <h2 id="popupMessage">คุณมีสิทธิ์ลุ้นโชคทั้งหมด</h2>
+      <div class="chance" id="chanceDisplay">0 สิทธิ์</div>
+      <button onclick="closePopup()">ปิด</button>
+    </div>
+  </div>
+
+  <script>
+    // 👇 ใส่ Google Apps Script URL ที่เชื่อม Google Sheet จริง
+    const scriptURL = 'https://script.google.com/macros/s/XXXXXXXXXXXX/exec';
+
+    document.getElementById('checkForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const phone = document.getElementById('phoneInput').value.trim();
+
+      fetch(`${scriptURL}?phone=${encodeURIComponent(phone)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.found) {
+            document.getElementById('popupMessage').textContent = 'คุณมีสิทธิ์ลุ้นโชคทั้งหมด';
+            document.getElementById('chanceDisplay').textContent = Number(data.chance).toLocaleString('th-TH') + ' สิทธิ์';
+          } else {
+            document.getElementById('popupMessage').textContent = 'ขออภัย! ไม่พบข้อมูลสมาชิก';
+            document.getElementById('chanceDisplay').textContent = '';
+          }
+          document.getElementById('popup').style.display = 'flex';
+        })
+        .catch(err => {
+          console.error(err);
+          alert('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง');
+        });
+    });
+
+    function closePopup() {
+      document.getElementById('popup').style.display = 'none';
+    }
+  </script>
+
+</body>
+</html>
