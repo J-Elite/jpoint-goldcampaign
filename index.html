@@ -199,47 +199,63 @@
     </div>
   </div>
 
-  <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbziQZTPJQri0NvG3B0sJTKEWBmMGdY4XE_feKGPSxdeRHrtQZlwBi0w85Sk_Jdtc12j/exec';
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    document.getElementById('checkForm').addEventListener('submit', function(e) {
+    // Firebase configuration (ของคุณ)
+    const firebaseConfig = {
+      apiKey: "AIzaSyCdWS5QrKaxBEo2KkSab4AhIgratEJGBoM",
+      authDomain: "j-point-gold-campaign.firebaseapp.com",
+      projectId: "j-point-gold-campaign",
+      storageBucket: "j-point-gold-campaign.firebasestorage.app",
+      messagingSenderId: "68153502424",
+      appId: "1:68153502424:web:32de54991ee3cc99a005ad"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const checkForm = document.getElementById('checkForm');
+    const loading = document.getElementById('loading');
+    const popup = document.getElementById('popup');
+    const popupMessage = document.getElementById('popupMessage');
+    const chanceDisplay = document.getElementById('chanceDisplay');
+
+    checkForm.addEventListener('submit', async function(e) {
       e.preventDefault();
       const phone = document.getElementById('phoneInput').value.trim();
-      const loading = document.getElementById('loading');
-      const popup = document.getElementById('popup');
 
-      loading.style.display = 'flex'; // แสดงหน้ารอโหลด
-      popup.style.display = 'none';  // ซ่อน popup กรณีกดเช็คใหม่
+      loading.style.display = 'flex';
+      popup.style.display = 'none';
 
-      // เพิ่ม delay เล็กน้อย เพื่อให้ popup โหลดแสดงผลก่อน fetch
-      setTimeout(() => {
-        fetch(`${scriptURL}?phone=${encodeURIComponent(phone)}`)
-          .then(res => res.json())
-          .then(data => {
-            loading.style.display = 'none'; // ซ่อน loading
-            popup.style.display = 'flex';   // แสดง popup
+      setTimeout(async () => {
+        try {
+          const ref = doc(db, "phones", phone);
+          const snap = await getDoc(ref);
+          loading.style.display = 'none';
+          popup.style.display = 'flex';
 
-            if (data.found) {
-              document.getElementById('popupMessage').textContent = 'คุณมีสิทธิ์ลุ้นโชคทั้งหมด';
-              document.getElementById('chanceDisplay').textContent = Number(data.chance).toLocaleString('th-TH') + ' สิทธิ์';
-            } else {
-              document.getElementById('popupMessage').textContent = 'ขออภัย! ไม่พบข้อมูลสมาชิก';
-              document.getElementById('chanceDisplay').textContent = '';
-            }
-          })
-          .catch(err => {
-            loading.style.display = 'none';
-            alert('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง');
-            console.error(err);
-          });
-      }, 100); // delay 100ms
+          if (snap.exists()) {
+            const data = snap.data();
+            popupMessage.textContent = 'คุณมีสิทธิ์ลุ้นโชคทั้งหมด';
+            chanceDisplay.textContent = Number(data.chance).toLocaleString('th-TH') + ' สิทธิ์';
+          } else {
+            popupMessage.textContent = 'ขออภัย! ไม่พบข้อมูลสมาชิก';
+            chanceDisplay.textContent = '';
+          }
+        } catch (err) {
+          loading.style.display = 'none';
+          alert('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง');
+          console.error(err);
+        }
+      }, 100);
     });
 
-    function closePopup() {
-      document.getElementById('popup').style.display = 'none';
-    }
+    window.closePopup = function() {
+      popup.style.display = 'none';
+    };
   </script>
 
 </body>
 </html>
-
