@@ -200,62 +200,65 @@
   </div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    // Firebase configuration (ของคุณ)
-    const firebaseConfig = {
-      apiKey: "AIzaSyCdWS5QrKaxBEo2KkSab4AhIgratEJGBoM",
-      authDomain: "j-point-gold-campaign.firebaseapp.com",
-      projectId: "j-point-gold-campaign",
-      storageBucket: "j-point-gold-campaign.firebasestorage.app",
-      messagingSenderId: "68153502424",
-      appId: "1:68153502424:web:32de54991ee3cc99a005ad"
-    };
+  // Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyCdWS5QrKaxBEo2KkSab4AhIgratEJGBoM",
+    authDomain: "j-point-gold-campaign.firebaseapp.com",
+    projectId: "j-point-gold-campaign",
+    storageBucket: "j-point-gold-campaign.firebasestorage.app",
+    messagingSenderId: "68153502424",
+    appId: "1:68153502424:web:32de54991ee3cc99a005ad"
+  };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+  console.log("Initializing Firebase with config:", firebaseConfig);
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
-    const checkForm = document.getElementById('checkForm');
-    const loading = document.getElementById('loading');
-    const popup = document.getElementById('popup');
-    const popupMessage = document.getElementById('popupMessage');
-    const chanceDisplay = document.getElementById('chanceDisplay');
+  const checkForm = document.getElementById('checkForm');
+  const loading = document.getElementById('loading');
+  const popup = document.getElementById('popup');
+  const popupMessage = document.getElementById('popupMessage');
+  const chanceDisplay = document.getElementById('chanceDisplay');
 
-    checkForm.addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const phone = document.getElementById('phoneInput').value.trim();
+  checkForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const phone = document.getElementById('phoneInput').value.trim();
+    console.log("Checking phone:", phone);
 
-      loading.style.display = 'flex';
-      popup.style.display = 'none';
+    loading.style.display = 'flex';
+    popup.style.display = 'none';
 
-      setTimeout(async () => {
-        try {
-          const ref = doc(db, "phones", phone);
-          const snap = await getDoc(ref);
-          loading.style.display = 'none';
-          popup.style.display = 'flex';
+    setTimeout(async () => {
+      try {
+        const ref = doc(db, "phones", phone);
+        console.log("Document ref:", ref.path);
 
-          if (snap.exists()) {
-            const data = snap.data();
-            popupMessage.textContent = 'คุณมีสิทธิ์ลุ้นโชคทั้งหมด';
-            chanceDisplay.textContent = Number(data.chance).toLocaleString('th-TH') + ' สิทธิ์';
-          } else {
-            popupMessage.textContent = 'ขออภัย! ไม่พบข้อมูลสมาชิก';
-            chanceDisplay.textContent = '';
-          }
-        } catch (err) {
-          loading.style.display = 'none';
-          alert('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง');
-          console.error(err);
+        const snap = await getDoc(ref);
+        console.log("Firestore response (exists?):", snap.exists(), snap.data());
+
+        loading.style.display = 'none';
+        popup.style.display = 'flex';
+
+        if (snap.exists()) {
+          const data = snap.data();
+          popupMessage.textContent = 'คุณมีสิทธิ์ลุ้นโชคทั้งหมด';
+          chanceDisplay.textContent = Number(data.chance).toLocaleString('th-TH') + ' สิทธิ์';
+        } else {
+          popupMessage.textContent = 'ขออภัย! ไม่พบข้อมูลสมาชิก';
+          chanceDisplay.textContent = '';
         }
-      }, 100);
-    });
+      } catch (err) {
+        loading.style.display = 'none';
+        console.error("Firestore Error:", err);
+        alert('เกิดข้อผิดพลาด: ' + err.message);
+      }
+    }, 100);
+  });
 
-    window.closePopup = function() {
-      popup.style.display = 'none';
-    };
-  </script>
-
-</body>
-</html>
+  window.closePopup = function() {
+    popup.style.display = 'none';
+  };
+</script>
