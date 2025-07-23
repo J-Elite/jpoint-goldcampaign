@@ -203,8 +203,7 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-  // Firebase configuration
-   const firebaseConfig = {
+  const firebaseConfig = {
     apiKey: "AIzaSyAbBBqwaGU0MWm1nHZxOM2CWEvXPw1t6D8",
     authDomain: "j-point-gold.firebaseapp.com",
     projectId: "j-point-gold",
@@ -213,7 +212,9 @@
     appId: "1:653438698513:web:18a0941e65f52b84269db0"
   };
 
-  console.log("Initializing Firebase with config:", firebaseConfig);
+  // ลบ console.log เพื่อไม่แสดงข้อมูล sensitive ใน console
+  // console.log("Initializing Firebase with config:", firebaseConfig);
+
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
@@ -226,7 +227,8 @@
   checkForm.addEventListener('submit', async function(e) {
     e.preventDefault();
     const phone = document.getElementById('phoneInput').value.trim();
-    console.log("Checking phone:", phone);
+    // ลบ console.log เพื่อไม่แสดงข้อมูล sensitive ใน console
+    // console.log("Checking phone:", phone);
 
     loading.style.display = 'flex';
     popup.style.display = 'none';
@@ -234,10 +236,12 @@
     setTimeout(async () => {
       try {
         const ref = doc(db, "phones", phone);
-        console.log("Document ref:", ref.path);
+        // ลบ console.log เพื่อไม่แสดงข้อมูล sensitive ใน console
+        // console.log("Document ref:", ref.path);
 
         const snap = await getDoc(ref);
-        console.log("Firestore response (exists?):", snap.exists(), snap.data());
+        // ลบ console.log เพื่อไม่แสดงข้อมูล sensitive ใน console
+        // console.log("Firestore response (exists?):", snap.exists(), snap.data());
 
         loading.style.display = 'none';
         popup.style.display = 'flex';
@@ -252,8 +256,9 @@
         }
       } catch (err) {
         loading.style.display = 'none';
-        console.error("Firestore Error:", err);
-        alert('เกิดข้อผิดพลาด: ' + err.message);
+        // ลบ console.error เพื่อไม่แสดงข้อมูล sensitive ใน console
+        // console.error("Firestore Error:", err);
+        alert('เกิดข้อผิดพลาด: กรุณาลองใหม่ภายหลัง');
       }
     }, 100);
   });
@@ -261,4 +266,6 @@
   window.closePopup = function() {
     popup.style.display = 'none';
   };
-</script>
+  </script>
+</body>
+</html>
